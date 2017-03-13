@@ -15,11 +15,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_TABLE = "table_name";
     private static final int DATABASE_VERSION = 1;
 
-    public static final String ID_COLUMN = "id";
-    public static final String NAME_COLUMN = "name";
+    private static final String ID_COLUMN = "id";
+    private static final String NAME_COLUMN = "name";
 
 
-    public static final String CREATE_DATABASE_TABLE = "CREATE TABLE "
+    private static final String CREATE_DATABASE_TABLE = "CREATE TABLE "
             + DATABASE_TABLE + "(" + ID_COLUMN + " INTEGER PRIMARY KEY, "
             + NAME_COLUMN + " TEXT)";
 
