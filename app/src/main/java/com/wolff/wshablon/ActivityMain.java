@@ -5,7 +5,10 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -22,22 +25,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.wolff.wshablon.fragments.Fragment_camera;
+import com.wolff.wshablon.fragments.Fragment_catalog;
 import com.wolff.wshablon.fragments.Fragment_item;
 import com.wolff.wshablon.fragments.Fragment_logo;
+import com.wolff.wshablon.objects.WItem;
+
+import java.io.File;
 
 public class ActivityMain extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,Fragment_catalog.Fragment_catalogListener {
     private FloatingActionButton fab;
     private Fragment_logo fragment_logo;
     private Fragment_item fragment_item;
+    private Fragment_camera fragment_camera;
+    private Fragment_catalog fragment_catalog;
     private SharedPreferences sharedPreferences;
 
-    final String TAG = "!!!!!!!!!!";
-    final int TYPE_PHOTO = 1;
-    final int TYPE_VIDEO = 2;
-
-    final int REQUEST_CODE_PHOTO = 1;
-    final int REQUEST_CODE_VIDEO = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +79,12 @@ public class ActivityMain extends AppCompatActivity
         View headerLayout = navigationView.getHeaderView(0);
         TextView tvHeader_line1 = (TextView) headerLayout.findViewById(R.id.tvHeader_line1);
         TextView tvHeader_line2 = (TextView) headerLayout.findViewById(R.id.tvHeader_line2);
-        fragment_item = new Fragment_item();
-        displayFragment(fragment_item);
+        tvHeader_line1.setText("");
+        tvHeader_line2.setText("");
+        fragment_catalog = new Fragment_catalog();
+        //fragment_item = new Fragment_item();
+        fragment_camera = new Fragment_camera();
+        displayFragment(fragment_catalog);
          }
 
     @Override
@@ -105,6 +113,9 @@ public class ActivityMain extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+           displayFragment(fragment_camera);
+
+
             return true;
         }
 
@@ -116,7 +127,7 @@ public class ActivityMain extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        displayFragment(fragment_catalog);
         if (id == R.id.nav_camera) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
@@ -142,50 +153,18 @@ public void displayFragment(Fragment fragment){
     fragmentTransaction = getFragmentManager().beginTransaction();
     fragmentTransaction.replace(R.id.content_activity_main,fragment);
     fragmentTransaction.commit();
-    if(fragment.getClass().getSimpleName().equalsIgnoreCase("Fragment_logo")){
+    if(fragment.getClass().getSimpleName().equalsIgnoreCase("Fragment_catalog")){
         fab.setVisibility(View.VISIBLE);
     }else {
         fab.setVisibility(View.INVISIBLE);
     }
 }
 
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode,
-                                    Intent intent) {
-        if (requestCode == REQUEST_CODE_PHOTO) {
-            if (resultCode == RESULT_OK) {
-                if (intent == null) {
-                    Log.d(TAG, "Intent is null");
-                } else {
-                    Log.d(TAG, "Photo uri: " + intent.getData());
-                    Bundle bndl = intent.getExtras();
-                    if (bndl != null) {
-                        Object obj = intent.getExtras().get("data");
-                        if (obj instanceof Bitmap) {
-                            Bitmap bitmap = (Bitmap) obj;
-                            Log.d(TAG, "bitmap " + bitmap.getWidth() + " x "
-                                    + bitmap.getHeight());
-                            fragment_item.ivPhoto.setImageBitmap(bitmap);
-                        }
-                    }
-                }
-            } else if (resultCode == RESULT_CANCELED) {
-                Log.d(TAG, "Canceled");
-            }
-        }
-
-        if (requestCode == REQUEST_CODE_VIDEO) {
-            if (resultCode == RESULT_OK) {
-                if (intent == null) {
-                    Log.d(TAG, "Intent is null");
-                } else {
-                    Log.d(TAG, "Video uri: " + intent.getData());
-                }
-            } else if (resultCode == RESULT_CANCELED) {
-                Log.d(TAG, "Canceled");
-            }
-        }
+    public void onItemInListSelected(WItem item) {
+        fragment_item = Fragment_item.newInstance(item);
+        displayFragment(fragment_item);
+        Log.e("ACTIVITY","onItemInListSelected"+item.getName());
     }
-
-
 }

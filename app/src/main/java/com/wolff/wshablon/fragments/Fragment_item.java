@@ -2,6 +2,7 @@ package com.wolff.wshablon.fragments;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -11,69 +12,79 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
 import com.wolff.wshablon.R;
+import com.wolff.wshablon.objects.WItem;
+import com.wolff.wshablon.objects.WSeasons;
 
 import java.io.File;
+//import java.net.URI;
+
+import static android.R.layout.simple_list_item_1;
 
 /**
  * Created by wolff on 13.03.2017.
  */
 
 public class Fragment_item extends Fragment {
-    File directory;
-    final int TYPE_PHOTO = 1;
-    final int TYPE_VIDEO = 2;
-
-    final int REQUEST_CODE_PHOTO = 1;
-    final int REQUEST_CODE_VIDEO = 2;
 
     final String TAG = "!!!!!!!!!!";
+    private WItem mainItem;
+    private boolean isNewItem;
 
-    public ImageView ivPhoto;
+    private ImageView ivPhoto;
+    private EditText edName;
+    private Spinner spSeason;
+    private EditText edMinTemperature;
+    private EditText edMaxTemperature;
 
+    public static Fragment_item newInstance(WItem item){
+
+        Fragment_item fragment = new Fragment_item();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("WItem",item);
+         fragment.setArguments(bundle);
+        return fragment;
+    }
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
+        savedInstanceState = this.getArguments();
+        if (savedInstanceState != null) {
+           mainItem = (WItem)savedInstanceState.getSerializable("WItem");
+            if(mainItem!=null){
+                isNewItem=false;
+            }else {
+                isNewItem=true;
+            }
+        }
+        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
-        createDirectory();
-
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, generateFileUri(TYPE_PHOTO));
-        getActivity().startActivityForResult(intent, REQUEST_CODE_PHOTO);
-
     }
 
-    @Nullable
+            @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item,container, false);
-        ivPhoto = (ImageView) view.findViewById(R.id.ivPhoto);
+            View view = inflater.inflate(R.layout.fragment_item,container, false);
+                ivPhoto = (ImageView) view.findViewById(R.id.ivPhoto);
+                edName = (EditText) view.findViewById(R.id.edName);
+                spSeason = (Spinner) view.findViewById(R.id.spSeason);
 
+                ArrayAdapter<WSeasons> spAdapter = new ArrayAdapter<WSeasons>(getActivity(),android.R.layout.simple_list_item_1, WSeasons.values());
+                spSeason.setAdapter(spAdapter);
+                spSeason.setSelection(spAdapter.getPosition(mainItem.getSeason()));
+                edName.setText(mainItem.getName());
+                try {
+                    //ivPhoto.setImageDrawable(Drawable.createFromPath(mainItem.getPictureName()));
+                    ivPhoto.setImageURI(Uri.parse("file:"+mainItem.getPictureName()));
+                }catch (Exception e){
+                    ivPhoto.setImageResource(R.drawable.ic_menu_camera);
+                }
         return view;
     }
 
-    private Uri generateFileUri(int type) {
-        File file = null;
-        switch (type) {
-            case TYPE_PHOTO:
-                file = new File(directory.getPath() + "/" + "photo_"
-                        + System.currentTimeMillis() + ".jpg");
-                break;
-            case TYPE_VIDEO:
-                file = new File(directory.getPath() + "/" + "video_"
-                        + System.currentTimeMillis() + ".mp4");
-                break;
-        }
-        Log.d(TAG, "fileName = " + file);
-        return Uri.fromFile(file);
-    }
-    private void createDirectory() {
-        directory = new File(
-                Environment
-                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                "MyFolder");
-        if (!directory.exists())
-            directory.mkdirs();
-    }
+
 }
