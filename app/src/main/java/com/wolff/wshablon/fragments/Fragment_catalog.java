@@ -39,7 +39,7 @@ public class Fragment_catalog extends ListFragment {
         //TEST String name,WSeasons season,int minTemperature,int maxTemperature,String pictureName
         mainCatalogList.add(new WItem("name 1", WSeasons.AUTUMN,10,30,"c:/temp/q.jpg"));
         mainCatalogList.add(new WItem("name 2", WSeasons.SPRING,1,20,"c:/temp/q.jpg"));
-        mainCatalogList.add(new WItem("name 3", WSeasons.SUMMER,30,50,"c:/temp/q.jpg"));
+        mainCatalogList.add(new WItem("name 3", WSeasons.SUMMER,30,50,"/storage/emulated/0/Pictures/WCatalog/item_1489687170280.jpg"));
         mainCatalogList.add(new WItem("name 4", WSeasons.WINTER,0,6,"/storage/emulated/0/Pictures/WCatalog/item_1489673404231.jpg"));
 
     }

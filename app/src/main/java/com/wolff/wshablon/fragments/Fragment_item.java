@@ -1,14 +1,9 @@
 package com.wolff.wshablon.fragments;
 
 import android.app.Fragment;
-import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +16,7 @@ import com.wolff.wshablon.R;
 import com.wolff.wshablon.objects.WItem;
 import com.wolff.wshablon.objects.WSeasons;
 
-import java.io.File;
 //import java.net.URI;
-
-import static android.R.layout.simple_list_item_1;
 
 /**
  * Created by wolff on 13.03.2017.
@@ -77,12 +69,8 @@ public class Fragment_item extends Fragment {
                 spSeason.setAdapter(spAdapter);
                 spSeason.setSelection(spAdapter.getPosition(mainItem.getSeason()));
                 edName.setText(mainItem.getName());
-                try {
-                    //ivPhoto.setImageDrawable(Drawable.createFromPath(mainItem.getPictureName()));
-                    ivPhoto.setImageURI(Uri.parse("file:"+mainItem.getPictureName()));
-                }catch (Exception e){
-                    ivPhoto.setImageResource(R.drawable.ic_menu_camera);
-                }
+                //ivPhoto.setImageDrawable(Drawable.createFromPath(mainItem.getPictureName()));
+                ivPhoto.setImageURI(Uri.parse("file:"+mainItem.getPictureName()));
         return view;
     }
 
