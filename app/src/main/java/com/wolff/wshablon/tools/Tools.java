@@ -1,6 +1,7 @@
 package com.wolff.wshablon.tools;
 
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 
@@ -22,7 +23,9 @@ public class Tools {
     }
     public File getPictureFullPath(){
         //+"/item_"+ System.currentTimeMillis() + ".jpg"
-        return new File(getPicturesDirectory()+"/item_"+ System.currentTimeMillis() + ".jpg");
+        String ppath = getPicturesDirectory()+"/item_"+ System.currentTimeMillis() + ".jpg";
+        Log.e("getPictureFullPath",""+ppath);
+        return new File(ppath);
     }
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();

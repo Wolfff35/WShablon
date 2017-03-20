@@ -167,4 +167,13 @@ public void displayFragment(Fragment fragment){
         displayFragment(fragment_item);
         Log.e("ACTIVITY","onItemInListSelected"+item.getName());
     }
+
+/*    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {return;}
+        Log.e("MAIN","onActivityResult: requestCode - "+requestCode+"; resultCode - "+resultCode);
+        //String name = data.getStringExtra("name");
+        //tvName.setText("Your name is " + name);
+    }
+*/
 }
