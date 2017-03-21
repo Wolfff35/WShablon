@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import com.wolff.wshablon.listAdapters.CatalogListAdapter;
 import com.wolff.wshablon.objects.WItem;
 import com.wolff.wshablon.objects.WSeasons;
+import com.wolff.wshablon.sqlite.DatabaseHelper;
 
 import java.util.ArrayList;
 
@@ -30,19 +31,15 @@ public class Fragment_catalog extends ListFragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " must implement onSomeEventListener");
         }
-    }
+     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainCatalogList = new ArrayList<>();
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(getContext());
+        mainCatalogList = dbHelper.items_getAll_list();
 
-        //TEST String name,WSeasons season,int minTemperature,int maxTemperature,String pictureName
-        mainCatalogList.add(new WItem("name 1", WSeasons.AUTUMN,10,30,"c:/temp/q.jpg"));
-        mainCatalogList.add(new WItem("name 2", WSeasons.SPRING,1,20,"c:/temp/q.jpg"));
-        mainCatalogList.add(new WItem("name 3", WSeasons.SUMMER,30,50,"/storage/emulated/0/Pictures/WCatalog/item_1489687170280.jpg"));
-        mainCatalogList.add(new WItem("name 4", WSeasons.WINTER,0,6,"/storage/emulated/0/Pictures/WCatalog/item_1489673404231.jpg"));
-
-    }
+     }
 
         @Override
     public void onActivityCreated(Bundle savedInstanceState) {

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_save"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_save"
+        android:orderInCategory="100"
+        android:title="Сохранить"
+        android:visible="true"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_undo"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:orderInCategory="100"
+        android:title="Отмена"
+        android:visible="true"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_delete"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:orderInCategory="100"
+        android:title="Удалить"
+        app:showAsAction="always" />
+</menu>

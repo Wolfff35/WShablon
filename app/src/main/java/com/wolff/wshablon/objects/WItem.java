@@ -13,14 +13,26 @@ public class WItem implements Serializable{
     private int maxTemperature;
     private WSeasons season;
     private  String name;
+    private long id;
 
-    public WItem(String name,WSeasons season,int minTemperature,int maxTemperature,String pictureName){
+    public WItem(long id,String name,WSeasons season,int minTemperature,int maxTemperature,String pictureName){
         this.name = name;
         this.season = season;
         this.minTemperature = minTemperature;
         this.maxTemperature = maxTemperature;
         this.pictureName =pictureName;
+        this.id = id;
 
+    }
+    public WItem(){
+
+    }
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getPictureName() {

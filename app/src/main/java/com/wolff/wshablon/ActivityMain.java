@@ -23,13 +23,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
-import com.wolff.wshablon.fragments.Fragment_camera;
 import com.wolff.wshablon.fragments.Fragment_catalog;
 import com.wolff.wshablon.fragments.Fragment_item;
 import com.wolff.wshablon.fragments.Fragment_logo;
 import com.wolff.wshablon.objects.WItem;
+import com.wolff.wshablon.objects.WSeasons;
+import com.wolff.wshablon.sqlite.DatabaseHelper;
 
 import java.io.File;
 
@@ -38,7 +40,6 @@ public class ActivityMain extends AppCompatActivity
     private FloatingActionButton fab;
     private Fragment_logo fragment_logo;
     private Fragment_item fragment_item;
-    private Fragment_camera fragment_camera;
     private Fragment_catalog fragment_catalog;
     private SharedPreferences sharedPreferences;
 
@@ -55,8 +56,10 @@ public class ActivityMain extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                fragment_item = Fragment_item.newInstance(null);
+                displayFragment(fragment_item);
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                 //       .setAction("Action", null).show();
             }
         });
 
@@ -83,7 +86,7 @@ public class ActivityMain extends AppCompatActivity
         tvHeader_line2.setText("");
         fragment_catalog = new Fragment_catalog();
         //fragment_item = new Fragment_item();
-        fragment_camera = new Fragment_camera();
+        //fragment_camera = new Fragment_camera();
         displayFragment(fragment_catalog);
          }
 
@@ -106,19 +109,24 @@ public class ActivityMain extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-           displayFragment(fragment_camera);
-
-
-            return true;
+        switch (id) {
+            case R.id.action_delete:
+                Log.e("MENU ACTIVITY", "DELETE");
+               // deleteItemFromBD();
+                break;
+            case R.id.action_save:
+                Log.e("MENU ACTIVITY", "SAVE");
+               // saveItemToBD();
+                break;
+            case R.id.action_undo:
+                Log.e("MENU ACTIVITY", "UNDO");
+                break;
+            default:
+                Log.e("MENU ACTIVITY", "DEFAULT");
+                break;
         }
-
+        displayFragment(fragment_catalog);
         return super.onOptionsItemSelected(item);
     }
 
@@ -168,12 +176,4 @@ public void displayFragment(Fragment fragment){
         Log.e("ACTIVITY","onItemInListSelected"+item.getName());
     }
 
-/*    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null) {return;}
-        Log.e("MAIN","onActivityResult: requestCode - "+requestCode+"; resultCode - "+resultCode);
-        //String name = data.getStringExtra("name");
-        //tvName.setText("Your name is " + name);
-    }
-*/
 }
