@@ -5,5 +5,5 @@ package com.wolff.wshablon.objects;
  */
 
 public enum WSeasons {
-    WINTER,SPRING,SUMMER,AUTUMN
+    НЕТ,ЗИМА,ВЕСНА,ЛЕТО,ОСЕНЬ
 }

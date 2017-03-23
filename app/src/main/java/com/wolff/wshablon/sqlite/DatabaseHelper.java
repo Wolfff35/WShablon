@@ -88,7 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.endTransaction();
             db.close();
         }
-        Log.e("SQLITE","ADD ITEM");
+        Log.e("SQLITE","ADD ITEM "+rowId);
         return rowId;
     }
     public void item_update(WItem item){
@@ -137,21 +137,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     newItem.setId(curr.getInt(curr.getColumnIndex(ID_COLUMN)));
                     newItem.setName(curr.getString(curr.getColumnIndex(NAME_COLUMN)));
                     newItem.setPictureName(curr.getString(curr.getColumnIndex(IMAGEPATH_COLUMN)));
-                    newItem.setSeason(WSeasons.valueOf(curr.getString(curr.getColumnIndex(SEASON_COLUMN))));
+                    try {
+                        newItem.setSeason(WSeasons.valueOf(curr.getString(curr.getColumnIndex(SEASON_COLUMN))));
+                    }catch (Exception ee){
+                        newItem.setSeason(WSeasons.valueOf("НЕТ"));
+                    }
                     newItem.setMinTemperature(curr.getInt(curr.getColumnIndex(MINT_COLUMN)));
                     newItem.setMaxTemperature(curr.getInt(curr.getColumnIndex(MAXT_COLUMN)));
-
+                    Log.e("ITEMS","NAME - "+newItem.getName()+"; ID - "+newItem.getId());
                     items.add(newItem);
                 }while(curr.moveToNext());
             }
         } catch (Exception e) {
-            //Log.d(TAG, "Error while trying to get posts from database");
+            Log.d("ERROR", "Error while trying to get posts from database \n"+e.getLocalizedMessage());
         } finally {
             if (curr != null && !curr.isClosed()) {
                 curr.close();
             }
         }
-        Log.e("DB HELPER",".,,,,,,,,,,,,,,,,,,,,,,Reading item list!"+items.size()+"; "+curr.getCount());
+        Log.e("DB HELPER","Reading item list! "+items.size()+"; "+curr.getCount());
         return items;
     }
 

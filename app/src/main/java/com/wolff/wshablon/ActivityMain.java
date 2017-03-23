@@ -85,8 +85,6 @@ public class ActivityMain extends AppCompatActivity
         tvHeader_line1.setText("");
         tvHeader_line2.setText("");
         fragment_catalog = new Fragment_catalog();
-        //fragment_item = new Fragment_item();
-        //fragment_camera = new Fragment_camera();
         displayFragment(fragment_catalog);
          }
 
@@ -100,33 +98,10 @@ public class ActivityMain extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.action_delete:
-                Log.e("MENU ACTIVITY", "DELETE");
-               // deleteItemFromBD();
-                break;
-            case R.id.action_save:
-                Log.e("MENU ACTIVITY", "SAVE");
-               // saveItemToBD();
-                break;
-            case R.id.action_undo:
-                Log.e("MENU ACTIVITY", "UNDO");
-                break;
-            default:
-                Log.e("MENU ACTIVITY", "DEFAULT");
-                break;
-        }
-        displayFragment(fragment_catalog);
+          displayFragment(fragment_catalog);
         return super.onOptionsItemSelected(item);
     }
 
@@ -135,19 +110,9 @@ public class ActivityMain extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        displayFragment(fragment_catalog);
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_select) {
+            displayFragment(fragment_catalog);
+        } else if (id == R.id.nav_select) {
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

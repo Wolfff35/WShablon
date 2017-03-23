@@ -4,6 +4,7 @@ package com.wolff.wshablon.fragments;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -38,7 +39,7 @@ public class Fragment_catalog extends ListFragment {
         mainCatalogList = new ArrayList<>();
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(getContext());
         mainCatalogList = dbHelper.items_getAll_list();
-
+        Log.e("===LIST","size = "+mainCatalogList.size());
      }
 
         @Override
