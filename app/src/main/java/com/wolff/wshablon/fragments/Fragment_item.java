@@ -2,8 +2,10 @@ package com.wolff.wshablon.fragments;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -134,6 +136,7 @@ public class Fragment_item extends Fragment {
             tvMinTemp.setText(String.valueOf(progress-seekDelta));
             //Log.e("SEEKBAR",""+seekBar.getId());
             //tvMinTemp.setText(String.valueOf(seekMinTemperature.getProgress()-seekDelta));
+            Log.e("SEEKBAR","MIN  progress = "+progress);
             if(seekMinTemperature.getProgress()>seekMaxTemperature.getProgress()){
                 seekMaxTemperature.setProgress(seekMinTemperature.getProgress());
             }
@@ -158,7 +161,7 @@ public class Fragment_item extends Fragment {
             tvMaxTemp.setText(String.valueOf(progress-seekDelta));
 
             //tvMaxTemp.setText(String.valueOf(seekMaxTemperature.getProgress()-seekDelta));
-            Log.e("SEEKBAR",""+seekBar.getId()+"; progress = "+progress+"; seekMaxTemperature.getProgress()"+seekMaxTemperature.getProgress());
+            Log.e("SEEKBAR","MAX  progress = "+progress);
             if(seekMinTemperature.getProgress()>seekMaxTemperature.getProgress()){
                 seekMinTemperature.setProgress(seekMaxTemperature.getProgress());
             }
@@ -260,6 +263,16 @@ public class Fragment_item extends Fragment {
         if(mainItem.getId()>0){
             DatabaseHelper dbh = DatabaseHelper.getInstance(getContext());
             dbh.item_delete(mainItem);
+            SharedPreferences spref = PreferenceManager.getDefaultSharedPreferences(getContext());
+            if(spref.getBoolean("deleteImages",false)){
+                File fil = new File(mainItem.getPictureName());
+                boolean deleted = fil.delete();
+                if (deleted){
+                    Toast toast = Toast.makeText(getContext(),"Удален файл "+mainItem.getPictureName(),Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+            mainItem=null;
         }else {
             Log.e("ITEM","NOTHING TO DELETE");
         }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Настройки подключения">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:title="Удалять картинки"
+            android:summary="удалять картинки при удалении записей"
+            android:key="deleteImages" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

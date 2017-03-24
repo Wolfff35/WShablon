@@ -5,11 +5,15 @@
         <item
             android:id="@+id/nav_catalog"
             android:icon="@drawable/ic_menu_catalog"
+            android:checked="true"
             android:title="Каталог" />
         <item
             android:id="@+id/nav_select"
             android:icon="@drawable/ic_menu_select"
             android:title="Выбор" />
-      </group>
-
+        <item
+            android:id="@+id/nav_preferences"
+            android:icon="@drawable/ic_menu_preferences"
+            android:title="Настройки" />
+    </group>
 </menu>
