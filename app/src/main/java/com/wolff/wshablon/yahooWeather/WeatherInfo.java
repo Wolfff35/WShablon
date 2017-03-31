@@ -5,6 +5,7 @@ import android.location.Address;
 
 import com.wolff.wshablon.yahooWeather.YahooWeather;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,8 @@ import java.util.List;
  * Created by wolff on 24.03.2017.
  */
 
-public class WeatherInfo {
+public class WeatherInfo implements Serializable {
+    private static final long serialVersionUID = 2256051469151804396L;
 
     String mTitle = "";
     String mDescription = "";

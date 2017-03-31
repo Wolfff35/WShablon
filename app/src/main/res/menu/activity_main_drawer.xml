@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group >
         <item
             android:id="@+id/nav_catalog"
             android:icon="@drawable/ic_menu_catalog"
-            android:checked="true"
             android:title="Каталог" />
         <item
             android:id="@+id/nav_select"

@@ -10,7 +10,7 @@ import java.io.File;
  */
 
 public class Tools {
-    public String getPicturesDirectory() {
+    private String getPicturesDirectory() {
         File directory;
         if(isExternalStorageWritable()) {
             directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "WCatalog");
@@ -27,7 +27,7 @@ public class Tools {
         Log.e("getPictureFullPath",""+ppath);
         return new File(ppath);
     }
-    public boolean isExternalStorageWritable() {
+    private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
             return true;

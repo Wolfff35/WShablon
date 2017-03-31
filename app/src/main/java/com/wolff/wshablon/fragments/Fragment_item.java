@@ -3,7 +3,11 @@ package com.wolff.wshablon.fragments;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -101,11 +105,9 @@ public class Fragment_item extends Fragment {
 
                 ArrayAdapter<WSeasons> spAdapter = new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1, WSeasons.values());
                 spSeason.setAdapter(spAdapter);
-                // tvMinTemp.setText("0");
-                //tvMaxTemp.setText("0");
                 seekMinTemperature.incrementProgressBy(seekIncrement);
                 seekMaxTemperature.incrementProgressBy(seekIncrement);
-                if(mainItem!=null&mainItem.getId()>0) {
+                if(mainItem!=null&&mainItem.getId()>0) {
                     spSeason.setSelection(spAdapter.getPosition(mainItem.getSeason()));
                     edName.setText(mainItem.getName());
                     seekMinTemperature.setProgress(mainItem.getMinTemperature()+seekDelta);
@@ -197,17 +199,41 @@ public class Fragment_item extends Fragment {
 
     private void setImage(){
         String path = mainItem.getPictureName();
+                 //ivPhoto.setImageURI(Uri.parse("file:"+mainItem.getPictureName()));
+                //ivPhoto.setImageDrawable(Drawable.createFromPath(mainItem.getPictureName()));
+    //=============================
+       // Uri selectedImageUri = data.getData();
+        //Uri selectedImageUri = Uri.parse("file:"+mainItem.getPictureName());
+        //selectedImagePath = getPath(selectedImageUri);
         if(path!=null){
             File fill = new File(mainItem.getPictureName());
             if (fill.exists()) {
-                //ivPhoto.setImageURI(Uri.parse("file:"+mainItem.getPictureName()));
-                ivPhoto.setImageDrawable(Drawable.createFromPath(mainItem.getPictureName()));
+                String selectedImagePath = mainItem.getPictureName();
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 4;
+
+                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+                int height = bitmap.getHeight(), width = bitmap.getWidth();
+
+                if (height > 1280 && width > 960) {
+                    Bitmap imgbitmap = BitmapFactory.decodeFile(selectedImagePath, options);
+                    ivPhoto.setImageBitmap(imgbitmap);
+
+                    System.out.println("Need to resize");
+                }else {
+                    ivPhoto.setImageDrawable(Drawable.createFromPath(mainItem.getPictureName()));
+                }
             } else {
                 ivPhoto.setImageResource(R.drawable.ic_menu_camera);
             }
         }else {
             ivPhoto.setImageResource(R.drawable.ic_menu_camera);
         }
+
+
+
+
+            //============================
         setOptionsMenuVisibility();
     }
 
@@ -242,7 +268,7 @@ public class Fragment_item extends Fragment {
             return super.onOptionsItemSelected(item);
     }
     //==============================================================================================
-    public void saveItemToBD(){
+    private void saveItemToBD(){
         DatabaseHelper dbh = DatabaseHelper.getInstance(getContext());
         mainItem.setName(edName.getText().toString());
         mainItem.setSeason(WSeasons.valueOf(spSeason.getSelectedItem().toString()));
@@ -259,7 +285,7 @@ public class Fragment_item extends Fragment {
             Log.e("ADD",""+mainItem.getId());
         }
     }
-    public void deleteItemFromBD(){
+    private void deleteItemFromBD(){
         if(mainItem.getId()>0){
             DatabaseHelper dbh = DatabaseHelper.getInstance(getContext());
             dbh.item_delete(mainItem);

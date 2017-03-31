@@ -12,6 +12,7 @@ import com.wolff.wshablon.listAdapters.CatalogListAdapter;
 import com.wolff.wshablon.objects.WItem;
 import com.wolff.wshablon.objects.WSeasons;
 import com.wolff.wshablon.sqlite.DatabaseHelper;
+import com.wolff.wshablon.yahooWeather.WeatherInfo;
 
 import java.util.ArrayList;
 
@@ -21,9 +22,9 @@ import java.util.ArrayList;
 
 public class Fragment_catalog extends ListFragment {
     private Fragment_catalogListener catalogListener;
-    CatalogListAdapter catalogListAdapter;
-    ArrayList<WItem> mainCatalogList;
-
+    private CatalogListAdapter catalogListAdapter;
+    private ArrayList<WItem> mainCatalogList;
+    private WeatherInfo mWeatherInfo;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -36,11 +37,12 @@ public class Fragment_catalog extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainCatalogList = new ArrayList<>();
+          mainCatalogList = new ArrayList<>();
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(getContext());
         mainCatalogList = dbHelper.items_getAll_list();
         Log.e("===LIST","size = "+mainCatalogList.size());
-     }
+
+    }
 
         @Override
     public void onActivityCreated(Bundle savedInstanceState) {

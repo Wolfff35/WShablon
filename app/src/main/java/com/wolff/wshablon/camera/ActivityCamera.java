@@ -1,6 +1,8 @@
 package com.wolff.wshablon.camera;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -27,13 +29,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 
+import com.wolff.wshablon.ActivityMain;
 import com.wolff.wshablon.R;
 import com.wolff.wshablon.tools.Tools;
 
@@ -78,15 +85,30 @@ public class ActivityCamera extends AppCompatActivity {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.fragment_camera);
         View.OnClickListener takePictureListener = new View.OnClickListener() {
-                @Override
+             @Override
                 public void onClick(View v) {
-             String imagePath = takePicture(getApplicationContext(),cameraDevice,textureView);
-             Intent intent = new Intent();
-             intent.putExtra("ImagePath",imagePath);
-             setResult(RESULT_OK,intent);
-             //Log.e(TAG,"imagePath = "+imagePath);
+                     String imagePath = takePicture(getApplicationContext(),cameraDevice,textureView);
+                     Intent intent = new Intent();
+                     intent.putExtra("ImagePath",imagePath);
+                     setResult(RESULT_OK,intent);
+                     int cx = btn_TakePicture.getWidth()/2;
+                     int cy = btn_TakePicture.getHeight()/2;
+                     float radius = btn_TakePicture.getWidth();
+                    Animator anim = ViewAnimationUtils.createCircularReveal(btn_TakePicture,cx,cy,radius,0);
+                    anim.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            //btn_TakePicture.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                    anim.start();
+                    //Log.e(TAG,"imagePath = "+imagePath);
                 }
             };
             textureView = (TextureView) findViewById(R.id.textureView);
@@ -168,8 +190,8 @@ public class ActivityCamera extends AppCompatActivity {
             assert map != null;
             imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions((Activity)context, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
-                //Log.e(TAG,"WRONG MANIFEST");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
+                Log.e(TAG,"WRONG MANIFEST");
                 return;
             }
 

@@ -159,4 +159,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return items;
     }
 
+    public ArrayList<WItem> items_getSelection_list(int minT,int maxT,WSeasons season) {
+        ArrayList<WItem>items = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = new String[]{ID_COLUMN, NAME_COLUMN, IMAGEPATH_COLUMN, MINT_COLUMN, MAXT_COLUMN, SEASON_COLUMN};
+        String selection;
+        String[] selectionArgs;
+        if(!season.name().equalsIgnoreCase("НЕТ")){
+            selection = ""+MINT_COLUMN+">=? AND "+MAXT_COLUMN+"<=? AND "+SEASON_COLUMN+"=?";
+            selectionArgs = new String[]{String.valueOf(minT),String.valueOf(maxT),season.name()};
+        }else {
+            selection = ""+MINT_COLUMN+">=? AND "+MAXT_COLUMN+"<=?";
+            selectionArgs = new String[]{String.valueOf(minT),String.valueOf(maxT)};
+        }
+       // Log.e("SELECTION"," = "+selection);
+       // Log.e("SELECTION","MIN > "+minT+" AND MAX<"+maxT);
+        String groupBy = null;
+        String having = null;
+        String orderBy = NAME_COLUMN + " DESC";
+        Cursor curr = db.query(DATABASE_TABLE, columns, selection, selectionArgs, groupBy, having, orderBy);
+        try {
+            if (curr.moveToFirst()) {
+                do {
+                    WItem newItem = new WItem();
+                    newItem.setId(curr.getInt(curr.getColumnIndex(ID_COLUMN)));
+                    newItem.setName(curr.getString(curr.getColumnIndex(NAME_COLUMN)));
+                    newItem.setPictureName(curr.getString(curr.getColumnIndex(IMAGEPATH_COLUMN)));
+                    try {
+                        newItem.setSeason(WSeasons.valueOf(curr.getString(curr.getColumnIndex(SEASON_COLUMN))));
+                    }catch (Exception ee){
+                        newItem.setSeason(WSeasons.valueOf("НЕТ"));
+                    }
+                    newItem.setMinTemperature(curr.getInt(curr.getColumnIndex(MINT_COLUMN)));
+                    newItem.setMaxTemperature(curr.getInt(curr.getColumnIndex(MAXT_COLUMN)));
+                    Log.e("ITEMS","NAME - "+newItem.getName()+"; MIN - "+newItem.getMinTemperature()+"; MAX - "+newItem.getMaxTemperature()+"; SEASON - "+newItem.getSeason());
+                    items.add(newItem);
+                }while(curr.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.d("ERROR", "Error while trying to get posts from database \n"+e.getLocalizedMessage());
+        } finally {
+            if (curr != null && !curr.isClosed()) {
+                curr.close();
+            }
+        }
+        Log.e("DB HELPER","Reading item list! "+items.size()+"; "+curr.getCount());
+        return items;
+    }
+
 }

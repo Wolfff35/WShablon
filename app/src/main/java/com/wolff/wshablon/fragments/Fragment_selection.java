@@ -4,105 +4,170 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.wolff.wshablon.yahooWeather.WeatherInfo;
-import com.wolff.wshablon.yahooWeather.YahooWeather;
 import com.wolff.wshablon.R;
-import com.wolff.wshablon.yahooWeather.YahooWeatherInfoListener;
+import com.wolff.wshablon.listAdapters.CatalogListAdapter;
+import com.wolff.wshablon.objects.WItem;
+import com.wolff.wshablon.objects.WSeasons;
+import com.wolff.wshablon.sqlite.DatabaseHelper;
+import com.wolff.wshablon.yahooWeather.WeatherInfo;
+
+import java.util.ArrayList;
 
 
 /**
  * Created by wolff on 24.03.2017.
  */
 
-public class Fragment_selection extends Fragment implements YahooWeatherInfoListener {
-    private YahooWeather mYahooWeather = YahooWeather.getInstance(5000, true);
+public class Fragment_selection extends Fragment {
+    private Fragment_catalog.Fragment_catalogListener catalogListener;
+    private CatalogListAdapter catalogListAdapter;
+    private ArrayList<WItem> mainCatalogList = new ArrayList<>();
+    private WeatherInfo mWeatherInfo;
+    private SeekBar seekMinTemp;
+    private SeekBar seekMaxTemp;
+    private Spinner spSeason;
+    private TextView tvWeatherInfo;
+    private ListView lvSelection;
+    private TextView tvMinTemp;
+    private TextView tvMaxTemp;
+    private int seekDelta = 50;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String _location = "Kiev";
-        if (!TextUtils.isEmpty(_location)) {
-          //  InputMethodManager imm = (InputMethodManager)getSystemService(
-          //          Context.INPUT_METHOD_SERVICE);
-          //  imm.hideSoftInputFromWindow(mEtAreaOfCity.getWindowToken(), 0);
-            searchByPlaceName(_location);
-          //  showProgressDialog();
-        } else {
-           // Toast.makeText(getApplicationContext(), "location is not inputted", Toast.LENGTH_SHORT).show();
-        }
+        Bundle args = getArguments();
+        mWeatherInfo = (WeatherInfo) args.getSerializable("WeatherInfo");
+        //Log.e("CATALOG","WEATHER INFO "+mWeatherInfo.getCurrentTemp());
 
     }
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_selection,container, false);
-         return view;
+        seekMinTemp = (SeekBar)view.findViewById(R.id.seekMinTemperature);
+        seekMaxTemp = (SeekBar)view.findViewById(R.id.seekMaxTemperature);
+        spSeason = (Spinner) view.findViewById(R.id.spSeason);
+        lvSelection = (ListView)view.findViewById(R.id.lvSelection);
+        tvWeatherInfo = (TextView)view.findViewById(R.id.tvWeatherInfo);
+        tvMinTemp = (TextView)view.findViewById(R.id.tvMinTemp);
+        tvMaxTemp = (TextView)view.findViewById(R.id.tvMaxTemp);
+        if(mWeatherInfo!=null) {
+            tvWeatherInfo.setText("" + mWeatherInfo.getCurrentConditionDate() + "\n Температура в Киеве: " + mWeatherInfo.getCurrentTemp() + "°С \n Ветер " + mWeatherInfo.getWindSpeed() + " м/с");
+            seekMinTemp.setProgress(mWeatherInfo.getCurrentTemp()+seekDelta-5);
+            seekMaxTemp.setProgress(mWeatherInfo.getCurrentTemp()+seekDelta+5);
+            tvMinTemp.setText(String.valueOf(mWeatherInfo.getCurrentTemp()-5));
+            tvMaxTemp.setText(String.valueOf(mWeatherInfo.getCurrentTemp()+5));
+        }else{
+            tvWeatherInfo.setText("Нет интернета");
+            seekMinTemp.setProgress(seekDelta);
+            seekMaxTemp.setProgress(seekDelta);
+            tvMinTemp.setText(String.valueOf(0));
+            tvMaxTemp.setText(String.valueOf(0));
+        }
+        ArrayAdapter<WSeasons> spAdapter = new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1, WSeasons.values());
+        spSeason.setAdapter(spAdapter);
+
+
+        seekMinTemp.setOnSeekBarChangeListener(minSeekBarChangeListener);
+        seekMaxTemp.setOnSeekBarChangeListener(maxSeekBarChangeListener);
+        spSeason.setOnItemSelectedListener(spSeasonOnItemSelectedListener);
+        makeSelection();
+        return view;
     }
 
     @Override
-    public void gotWeatherInfo(WeatherInfo weatherInfo, YahooWeather.ErrorType errorType) {
-        if (weatherInfo != null) {
-            if (mYahooWeather.getSearchMode() == YahooWeather.SEARCH_MODE.GPS) {
-                if (weatherInfo.getAddress() != null) {
-                    //mEtAreaOfCity.setText(YahooWeather.addressToPlaceName(weatherInfo.getAddress()));
-                    Log.e("== ADRESS",YahooWeather.addressToPlaceName(weatherInfo.getAddress()));
-                }
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            catalogListener = (Fragment_catalog.Fragment_catalogListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement onSomeEventListener");
+        }
+    }
+//====================================
+    private Spinner.OnItemSelectedListener spSeasonOnItemSelectedListener = new Spinner.OnItemSelectedListener() {
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        makeSelection();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    };
+    private SeekBar.OnSeekBarChangeListener minSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        tvMinTemp.setText(String.valueOf(progress-seekDelta));
+        if(seekMinTemp.getProgress()>seekMaxTemp.getProgress()){
+            seekMaxTemp.setProgress(seekMinTemp.getProgress());
+        }
+    makeSelection();
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
+};
+    private SeekBar.OnSeekBarChangeListener maxSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            tvMaxTemp.setText(String.valueOf(progress-seekDelta));
+          if(seekMinTemp.getProgress()>seekMaxTemp.getProgress()){
+                seekMinTemp.setProgress(seekMaxTemp.getProgress());
             }
-  //          mWeatherInfosLayout.removeAllViews();
-            //mTvTitle.setText(weatherInfo.getTitle());
-            Log.e("== TITLE",weatherInfo.getTitle());
-            Log.e("== CURRENT","====== CURRENT ======" + "\n" +
-                    "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
-                    "weather: " + weatherInfo.getCurrentText() + "\n" +
-                    "temperature in ºC: " + weatherInfo.getCurrentTemp() + "\n" +
-                    "wind chill: " + weatherInfo.getWindChill() + "\n" +
-                    "wind direction: " + weatherInfo.getWindDirection() + "\n" +
-                    "wind speed: " + weatherInfo.getWindSpeed() + "\n" +
-                    "Humidity: " + weatherInfo.getAtmosphereHumidity() + "\n" +
-                    "Pressure: " + weatherInfo.getAtmospherePressure() + "\n" +
-                    "Visibility: " + weatherInfo.getAtmosphereVisibility()
-            );
-            //if (weatherInfo.getCurrentConditionIcon() != null) {
-            //    mIvWeather0.setImageBitmap(weatherInfo.getCurrentConditionIcon());
-            //}
-            for (int i = 0; i < YahooWeather.FORECAST_INFO_MAX_SIZE; i++) {
-             //   final LinearLayout forecastInfoLayout = (LinearLayout)
-             //           getLayoutInflater().inflate(R.layout.forecastinfo, null);
-             //   final TextView tvWeather = (TextView) forecastInfoLayout.findViewById(R.id.textview_forecast_info);
-             //   final WeatherInfo.ForecastInfo forecastInfo = weatherInfo.getForecastInfoList().get(i);
-             //   tvWeather.setText("====== FORECAST " + (i+1) + " ======" + "\n" +
-             //           "date: " + forecastInfo.getForecastDate() + "\n" +
-             //           "weather: " + forecastInfo.getForecastText() + "\n" +
-             //           "low  temperature in ºC: " + forecastInfo.getForecastTempLow() + "\n" +
-             //           "high temperature in ºC: " + forecastInfo.getForecastTempHigh() + "\n"
-             //   );
-             //   final ImageView ivForecast = (ImageView) forecastInfoLayout.findViewById(R.id.imageview_forecast_info);
-             //   if (forecastInfo.getForecastConditionIcon() != null) {
-             //       ivForecast.setImageBitmap(forecastInfo.getForecastConditionIcon());
-             //   }
-             //   mWeatherInfosLayout.addView(forecastInfoLayout);
-            }
-        } else {
-            //setNoResultLayout(errorType.name());
+            makeSelection();
+
         }
 
-    }
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            //Log.e("SEEK START",""+seekMaxTemperature.getProgress());
+        }
 
-    private void searchByPlaceName(String location) {
-        mYahooWeather.setNeedDownloadIcons(true);
-        mYahooWeather.setUnit(YahooWeather.UNIT.CELSIUS);
-        mYahooWeather.setSearchMode(YahooWeather.SEARCH_MODE.PLACE_NAME);
-        mYahooWeather.queryYahooWeatherByPlaceName(getContext(), location, Fragment_selection.this);
-    }
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            //Log.e("SEEK STOP",""+seekMaxTemperature.getProgress());
+
+        }
+    };
+
+private void makeSelection(){
+  //Log.e("MAKE","SELECTION");
+        Context context = getActivity().getApplicationContext();
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(context);
+        mainCatalogList = dbHelper.items_getSelection_list(seekMinTemp.getProgress()-seekDelta,seekMaxTemp.getProgress()-seekDelta,(WSeasons) spSeason.getSelectedItem());
+        catalogListAdapter= new CatalogListAdapter(context,mainCatalogList);
+        lvSelection.setAdapter(catalogListAdapter);
+        lvSelection.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            catalogListener.onItemInListSelected(mainCatalogList.get(i));
+        }
+    });
+
+}
 
 }

@@ -6,6 +6,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.wolff.wshablon.yahooWeather.YahooWeatherLog;
 
@@ -288,12 +289,10 @@ import javax.xml.parsers.ParserConfigurationException;
         builder.scheme("https");
         builder.authority(YQL_WEATHER_ENDPOINT_AUTHORITY);
         builder.path(YQL_WEATHER_ENDPOINT_PATH);
-        builder.appendQueryParameter("q", "select * from weather.forecast where woeid in " +
-                "(select woeid from geo.places(1) where text=\"" +
-                placeName +
-                "\")");
+        builder.appendQueryParameter("q", "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text=\""+placeName +"\")");
         String queryUrl = builder.build().toString();
 
+        //String queryUrl = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22"+placeName +"%22)";
         YahooWeatherLog.d("query url : " + queryUrl);
 
         try {
@@ -336,6 +335,7 @@ import javax.xml.parsers.ParserConfigurationException;
             BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
             String currLine = "";
             try {
+                Log.e("WEATHER","111");
                 while ((currLine = buffer.readLine()) != null) {
                     qResult += currLine;
                 }
@@ -344,8 +344,9 @@ import javax.xml.parsers.ParserConfigurationException;
             }
         } catch (Exception e) {
             qResult = "";
+            //Log.e("WEATHER ERROR",""+e.getLocalizedMessage());
         }
-
+        //Log.e("WEATHER","qResult = "+qResult);
         return qResult;
     }
 
@@ -411,7 +412,7 @@ import javax.xml.parsers.ParserConfigurationException;
         } catch (Exception e) {
             qResult = "";
         }
-
+        Log.e("WEATHER",""+qResult);
         return qResult;
     }
 
@@ -493,10 +494,10 @@ import javax.xml.parsers.ParserConfigurationException;
             weatherInfo.setCurrentConditionDate(
                     currentConditionNode.getAttributes().getNamedItem("date").getNodeValue());
 
-            //if (mNeedDownloadIcons) {
+            if (mNeedDownloadIcons) {
             //    weatherInfo.setCurrentConditionIcon(ImageUtils.getBitmapFromWeb(
             //            weatherInfo.getCurrentConditionIconURL()));
-            //}
+            }
 
             for (int i = 0; i < FORECAST_INFO_MAX_SIZE; i++) {
                 this.parseForecastInfo(weatherInfo.getForecastInfoList().get(i), doc, i);

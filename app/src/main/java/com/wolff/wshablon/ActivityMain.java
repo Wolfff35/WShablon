@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,10 +25,13 @@ import com.wolff.wshablon.fragments.Fragment_logo;
 import com.wolff.wshablon.fragments.Fragment_preferences;
 import com.wolff.wshablon.fragments.Fragment_selection;
 import com.wolff.wshablon.objects.WItem;
+import com.wolff.wshablon.yahooWeather.WeatherInfo;
+import com.wolff.wshablon.yahooWeather.YahooWeather;
+import com.wolff.wshablon.yahooWeather.YahooWeatherInfoListener;
 
 
 public class ActivityMain extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,Fragment_catalog.Fragment_catalogListener {
+        implements NavigationView.OnNavigationItemSelectedListener,Fragment_catalog.Fragment_catalogListener, YahooWeatherInfoListener {
     private FloatingActionButton fab;
     private Fragment_logo fragment_logo;
     private Fragment_item fragment_item;
@@ -35,8 +39,9 @@ public class ActivityMain extends AppCompatActivity
     private Fragment_selection fragment_selection;
     private Fragment_preferences fragment_preferences;
     private SharedPreferences sharedPreferences;
-
-
+    private YahooWeather mYahooWeather;
+    private WeatherInfo mWeatherInfo;
+    private int currentFragment; //1 - logo,2 - catalog, 3 - selection, 4 - preferences, 5 - item
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +70,21 @@ public class ActivityMain extends AppCompatActivity
  ///================================================================================================
         fragment_logo = new Fragment_logo();
         displayFragment(fragment_logo);
+        //WEATHER
+        mYahooWeather = YahooWeather.getInstance(5000, true);
+        String _location = "Kiev";
+        if (!TextUtils.isEmpty(_location)) {
+            //  InputMethodManager imm = (InputMethodManager)getSystemService(
+            //          Context.INPUT_METHOD_SERVICE);
+            //  imm.hideSoftInputFromWindow(mEtAreaOfCity.getWindowToken(), 0);
+            searchByPlaceName(_location);
+            //  showProgressDialog();
+        } else {
+            // Toast.makeText(getApplicationContext(), "location is not inputted", Toast.LENGTH_SHORT).show();
+        }
 
+
+        //WEATHER
         NavigationMenuView navMenuView = (NavigationMenuView) navigationView.getChildAt(0);
         navMenuView.addItemDecoration(new DividerItemDecoration(ActivityMain.this, DividerItemDecoration.HORIZONTAL));
 
@@ -79,8 +98,7 @@ public class ActivityMain extends AppCompatActivity
         fragment_selection = new Fragment_selection();
         fragment_preferences = new Fragment_preferences();
 
-        displayFragment(fragment_catalog);
-         }
+    }
 
     @Override
     public void onBackPressed() {
@@ -95,7 +113,8 @@ public class ActivityMain extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-          displayFragment(fragment_catalog);
+        Log.e("CURRENTFRAG"," = = = = = = = "+currentFragment);
+        displayFragment(fragment_catalog);
         return super.onOptionsItemSelected(item);
     }
 
@@ -111,6 +130,11 @@ public class ActivityMain extends AppCompatActivity
                // Log.e("NAVIGATION","1 Catalog");
                 break;
             case R.id.nav_select:
+                if(currentFragment!=3) {
+                    Bundle args = new Bundle();
+                    args.putSerializable("WeatherInfo", mWeatherInfo);
+                    fragment_selection.setArguments(args);
+                }
                 displayFragment(fragment_selection);
                // Log.e("NAVIGATION","2 Selection");
                 break;
@@ -130,7 +154,7 @@ public class ActivityMain extends AppCompatActivity
     }
 
 //==================================================================================================
-public void displayFragment(Fragment fragment){
+private void displayFragment(Fragment fragment){
     FragmentTransaction fragmentTransaction;
     fragmentTransaction = getFragmentManager().beginTransaction();
     fragmentTransaction.replace(R.id.content_activity_main,fragment);
@@ -140,14 +164,66 @@ public void displayFragment(Fragment fragment){
     }else {
         fab.setVisibility(View.INVISIBLE);
     }
+    //currentFragment; //1 - logo,2 - catalog, 3 - selection, 4 - preferences, 5 - item
+    switch (fragment.getClass().getSimpleName()){
+        case "Fragment_logo":
+            currentFragment=1;
+            break;
+        case "Fagment_catalog":
+            currentFragment=2;
+            break;
+        case "Fragment_selection":
+            currentFragment=3;
+            break;
+        case "Fragment_preferences":
+            currentFragment=4;
+            break;
+        case "Fragment_item":
+            currentFragment=5;
+            break;
+    }
 }
+    @Override
+    public void gotWeatherInfo(WeatherInfo weatherInfo, YahooWeather.ErrorType errorType) {
+        if (weatherInfo != null) {
+            if (mYahooWeather.getSearchMode() == YahooWeather.SEARCH_MODE.GPS) {
+                if (weatherInfo.getAddress() != null) {
+                    //mEtAreaOfCity.setText(YahooWeather.addressToPlaceName(weatherInfo.getAddress()));
+                    //Log.e("== ADRESS",YahooWeather.addressToPlaceName(weatherInfo.getAddress()));
+                }
+            }
+            mWeatherInfo = weatherInfo;
+           /* Log.e("== TITLE",weatherInfo.getTitle());
+            Log.e("== CURRENT","====== CURRENT ======" + "\n" +
+                    "date: " + weatherInfo.getCurrentConditionDate() + "\n" +
+                    "weather: " + weatherInfo.getCurrentText() + "\n" +
+                    "temperature in ºC: " + weatherInfo.getCurrentTemp() + "\n" +
+                    "wind chill: " + weatherInfo.getWindChill() + "\n" +
+                    "wind direction: " + weatherInfo.getWindDirection() + "\n" +
+                    "wind speed: " + weatherInfo.getWindSpeed() + "\n" +
+                    "Humidity: " + weatherInfo.getAtmosphereHumidity() + "\n" +
+                    "Pressure: " + weatherInfo.getAtmospherePressure() + "\n" +
+                    "Visibility: " + weatherInfo.getAtmosphereVisibility()
+            );*/
+        } else {
 
+        }
+        displayFragment(fragment_catalog);
+
+    }
+
+    private void searchByPlaceName(String location) {
+        mYahooWeather.setNeedDownloadIcons(true);
+        mYahooWeather.setUnit(YahooWeather.UNIT.CELSIUS);
+        mYahooWeather.setSearchMode(YahooWeather.SEARCH_MODE.PLACE_NAME);
+        mYahooWeather.queryYahooWeatherByPlaceName(getApplicationContext(), location, ActivityMain.this);
+    }
 
     @Override
     public void onItemInListSelected(WItem item) {
         fragment_item = Fragment_item.newInstance(item);
         displayFragment(fragment_item);
-        Log.e("ACTIVITY","onItemInListSelected"+item.getName());
+        //Log.e("ACTIVITY","onItemInListSelected"+item.getName());
     }
 
 }
