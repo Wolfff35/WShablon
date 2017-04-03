@@ -118,7 +118,6 @@ public class Fragment_selection extends Fragment {
         if(seekMinTemp.getProgress()>seekMaxTemp.getProgress()){
             seekMaxTemp.setProgress(seekMinTemp.getProgress());
         }
-    makeSelection();
     }
 
     @Override
@@ -128,6 +127,7 @@ public class Fragment_selection extends Fragment {
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+        makeSelection();
 
     }
 };
@@ -138,7 +138,6 @@ public class Fragment_selection extends Fragment {
           if(seekMinTemp.getProgress()>seekMaxTemp.getProgress()){
                 seekMinTemp.setProgress(seekMaxTemp.getProgress());
             }
-            makeSelection();
 
         }
 
@@ -150,6 +149,7 @@ public class Fragment_selection extends Fragment {
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
             //Log.e("SEEK STOP",""+seekMaxTemperature.getProgress());
+            makeSelection();
 
         }
     };
